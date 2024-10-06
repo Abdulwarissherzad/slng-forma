@@ -1,0 +1,40 @@
+version: '3'
+services:
+  frontend:
+    container_name: forma_frontend
+    build:
+      context: .
+      dockerfile: docker/development/frontend/Dockerfile
+    volumes:
+      - ./frontend:/usr/src/app
+  backend:
+    container_name: forma_backend
+    build:
+      context: .
+      dockerfile: ./docker/development/backend/Dockerfile
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/local/share/ca-certificates/CA.crt:/usr/local/share/ca-certificates/CA.crt:ro
+    environment:
+      ENV: "dev"
+      AUTH: "https://qa.picard.pewo.int"
+      NODE_EXTRA_CA_CERTS: "/usr/local/share/ca-certificates/CA.crt"
+      SENDGRID_API_KEY: "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"
+  proxy:
+    container_name: forma_proxy
+    build:
+      context: .
+      dockerfile: ./docker/development/proxy/Dockerfile
+    ports:
+      - 3006:3006
+  mongo:
+    container_name: forma_mongo
+    image: "mongo:7.0.5"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: forma
+    volumes:
+      - ./data/db:/data/db
+      - ./dump:/data/dump
+    ports:
+      - 28017:27017

@@ -1,0 +1,37 @@
+version: '2'
+services:
+  proxy:
+    container_name: forma_proxy
+    image: "peworegistry.azurecr.io/forma_proxy:${VERSION}"
+    restart: always
+    ports:
+      - 4006:3006
+  frontend:
+    container_name: forma_frontend
+    image: "peworegistry.azurecr.io/forma_frontend:${VERSION}"
+    environment:
+      VITE_APP_ENV: "production"
+    restart: always
+  backend:
+    container_name: forma_backend
+    image: "peworegistry.azurecr.io/forma_backend:${VERSION}"
+    environment:
+      ENV: "production"
+      AUTH: "https://login.pewo.int"
+      NODE_EXTRA_CA_CERTS: "/usr/local/share/ca-certificates/CA.crt"
+      SENDGRID_API_KEY: "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"
+    volumes:
+      - /usr/local/share/ca-certificates/CA.crt:/usr/local/share/ca-certificates/CA.crt:ro
+    ports:
+      - 8001:8001
+    restart: always
+  mongo:
+    container_name: forma_mongo
+    image: "mongo:7.0.5"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: forma
+    volumes:
+      - /var/data/forma/db:/data/db
+      - /var/data/forma/dump:/data/dump
+    restart: always
